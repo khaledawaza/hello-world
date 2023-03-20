@@ -1,4 +1,5 @@
 import React from "react";
+import { View, Text } from "react-native";
 
 export default class Chat extends React.Component {
   constructor(props) {
@@ -7,9 +8,19 @@ export default class Chat extends React.Component {
   }
 
   render() {
+    console.log("props: ", this.props);
+    const { color, name } = this.props.route.params;
     return (
-      <View>
-        <Text>Hello world</Text>
+      <View
+        style={{
+          backgroundColor: color,
+          height: "100%",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Text style={{ color: "#fff", fontSize: "30" }}>Hello {name}</Text>
       </View>
     );
   }
