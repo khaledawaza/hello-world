@@ -1,22 +1,19 @@
 import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+const Stack = createStackNavigator();
+
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
 
 import Start from "./components/Start";
 import Chat from "./components/Chat";
 
 import "react-native-gesture-handler";
 
-import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
-import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyC06-qqiroljqJPbPt4coHND2PpwxJktNI",
   authDomain: "chatapp-15c7e.firebaseapp.com",
@@ -30,7 +27,11 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
-const Stack = createStackNavigator();
+
+<Stack.Screen name="ShoppingLists" component={ShoppingLists} />;
+<Stack.Screen name="ShoppingLists">
+  {(props) => <ShoppingLists db={db} {...props} />}
+</Stack.Screen>;
 
 export default class App extends React.Component {
   render() {
