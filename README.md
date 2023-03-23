@@ -21,7 +21,7 @@ Basic System Requirements
 node package manager
 git
 Quick Start Instructions
-1.) From your terminal or IDE terminal, clone the repository with the following command: git clone https://github.com/GuyRimel/Chat-Tack
+1.) From your terminal or IDE terminal, clone the repository with the following command: https://github.com/khaledawaza/hello-world
 
 2.) Install Expo CLI as a global npm package: npm install -g expo-cli
 
