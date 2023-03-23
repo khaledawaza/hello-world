@@ -1,11 +1,13 @@
 import React from "react";
-import { StyleSheet, View, Platform, KeyboardAvoidingView } from "react-native";
-import { GiftedChat, Bubble, InputToolbar } from "react-native-gifted-chat";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import NetInfo from "@react-native-community/netinfo";
-import CustomActions from "./CustomActions";
-import MapView from "react-native-maps";
-import { ActionSheetProvider } from "@expo/react-native-action-sheet";
+import {
+  StyleSheet,
+  View,
+  Text,
+  Platform,
+  KeyboardAvoidingView,
+  FlatList,
+} from "react-native";
+import { Bubble, GiftedChat } from "react-native-gifted-chat";
 
 // Google firebase / firestore
 const firebase = require("firebase");
