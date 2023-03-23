@@ -5,7 +5,6 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 // MAIN APP COMPONENTS //////////
 import Start from "./components/Start";
 import Chat from "./components/Chat";
-import CustomActions from "./components/CustomActions";
 const Tab = createBottomTabNavigator();
 
 export default class App extends React.Component {
