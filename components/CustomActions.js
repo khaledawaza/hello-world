@@ -2,9 +2,11 @@ import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import PropTypes from "prop-types";
 import { connectActionSheet } from "@expo/react-native-action-sheet";
-import * as ImagePicker from "expo-image-picker";
 import * as Permissions from "expo-permissions";
+import * as ImagePicker from "expo-image-picker";
+import { Camera } from "expo-camera";
 import * as Location from "expo-location";
+import firebase from "firebase";
 
 const firebase = require("firebase");
 require("firebase/firestore");
