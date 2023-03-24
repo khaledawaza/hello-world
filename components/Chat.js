@@ -16,9 +16,11 @@ import {
 } from "react-native";
 import { GiftedChat } from "react-native-gifted-chat";
 
-const Chat = ({ db, route }) => {
+const Chat = ({ db, route, navigation }) => {
   const { username, userId, color } = route.params;
   const [messages, setMessages] = useState([]);
+
+  navigation.setOptions({ title: username });
 
   const onSend = useCallback(async (message = []) => {
     console.log("message: ", message.at(0));

@@ -2,6 +2,7 @@ import { getAuth, signInAnonymously } from "firebase/auth";
 import React, { useState } from "react";
 import {
   View,
+  Platform,
   Text,
   TextInput,
   StyleSheet,

@@ -8,6 +8,7 @@ import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "./app-config";
 import { getFirestore } from "firebase/firestore";
 import Welcome from "./components/Welcome";
+import Start from "./components/Start";
 const Stack = createStackNavigator();
 
 const App = () => {
@@ -16,12 +17,14 @@ const App = () => {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Welcome">
-        <Stack.Screen name="Welcome" component={Welcome} />
+      <Stack.Navigator initialRouteName="Start">
+        <Stack.Screen name="Start" component={Start} />
         <Stack.Screen name="ShoppingList">
           {(props) => <ShoppingList db={db} {...props} />}
         </Stack.Screen>
-        <Stack.Screen name="Chat" component={Chat} />
+        <Stack.Screen name="Chat">
+          {(props) => <Chat db={db} {...props} />}
+        </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
   );
