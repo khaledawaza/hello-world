@@ -1,30 +1,30 @@
 import React from "react";
 import "react-native-gesture-handler";
 import { NavigationContainer } from "@react-navigation/native";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-// MAIN APP COMPONENTS //////////
-import Start from "./components/Start";
 import Chat from "./components/Chat";
-const Tab = createBottomTabNavigator();
+import { createStackNavigator } from "@react-navigation/stack";
+import ShoppingList from "./components/ShoppingList";
+import { initializeApp } from "firebase/app";
+import { firebaseConfig } from "./app-config";
+import { getFirestore } from "firebase/firestore";
+import Welcome from "./components/Welcome";
+const Stack = createStackNavigator();
 
-export default class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { text: "" };
-  }
+const App = () => {
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-  renderCustomActions(props) {
-    return <CustomActions {...props} />;
-  }
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Welcome">
+        <Stack.Screen name="Welcome" component={Welcome} />
+        <Stack.Screen name="ShoppingList">
+          {(props) => <ShoppingList db={db} {...props} />}
+        </Stack.Screen>
+        <Stack.Screen name="Chat" component={Chat} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
 
-  render() {
-    return (
-      <NavigationContainer>
-        <Tab.Navigator initialRouteName="Start">
-          <Tab.Screen name="Start" component={Start} />
-          <Tab.Screen name="Chat" component={Chat} />
-        </Tab.Navigator>
-      </NavigationContainer>
-    );
-  }
-}
+export default App;
