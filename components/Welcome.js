@@ -2,13 +2,14 @@ import React from "react";
 import { View, Text, TouchableOpacity, Alert, StyleSheet } from "react-native";
 import { getAuth, signInAnonymously } from "firebase/auth";
 
-const Welcome = ({ navigation }) => {
+const Welcome = ({ navigation, route }) => {
+  const { username, color } = route.params;
   const auth = getAuth();
 
   async function login() {
     try {
       const res = await signInAnonymously(auth);
-      navigation.navigate("ShoppingList", { userId: res.user.uid });
+      navigation.navigate("Chat", { color, userId: res.user.uid, username });
       Alert.alert("Signin successful");
     } catch (err) {
       console.log(err);
@@ -17,9 +18,9 @@ const Welcome = ({ navigation }) => {
   }
   return (
     <View style={styles.container}>
-      <Text>Welcome</Text>
+      <Text>Welcome {username}</Text>
       <TouchableOpacity style={styles.button} onPress={login}>
-        Login
+        <Text style={{ color: "#fff" }}>Login</Text>
       </TouchableOpacity>
     </View>
   );

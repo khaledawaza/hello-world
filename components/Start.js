@@ -1,4 +1,5 @@
-import React from "react";
+import { getAuth, signInAnonymously } from "firebase/auth";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,6 +7,9 @@ import {
   StyleSheet,
   ImageBackground,
   TouchableOpacity,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 
 const backgroundColors = {
@@ -15,15 +19,15 @@ const backgroundColors = {
   green: { backgroundColor: "#b9c6ae" },
 };
 
-export default class Start extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { name: "", color: "" };
-  }
-  render() {
-    const { black, purple, grey, green } = backgroundColors;
-    return (
-      <View style={styles.container}>
+const Start = ({ navigation }) => {
+  const [name, setName] = useState("");
+  const { black, purple, grey, green } = backgroundColors;
+  const [color, setColor] = useState(black.backgroundColor);
+  const auth = getAuth();
+
+  return (
+    <View style={styles.container}>
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <ImageBackground
           source={require("../assets/bg.png")}
           style={[styles.container, styles.image]}
@@ -32,8 +36,8 @@ export default class Start extends React.Component {
           <View style={styles.inputBox}>
             <TextInput
               style={styles.nameBox}
-              onChangeText={(name) => this.setState({ name })}
-              value={this.state.name}
+              onChangeText={(name) => setName(name)}
+              value={name}
               placeholder="Enter your Name"
             />
             <View>
@@ -41,36 +45,32 @@ export default class Start extends React.Component {
               <View style={styles.colorWrapper}>
                 <TouchableOpacity
                   style={[styles.color, black]}
-                  onPress={() =>
-                    this.setState({ color: black.backgroundColor })
-                  }
+                  onPress={() => setColor(black.backgroundColor)}
                 />
                 <TouchableOpacity
                   style={[styles.color, purple]}
-                  onPress={() =>
-                    this.setState({ color: purple.backgroundColor })
-                  }
+                  onPress={() => setColor(purple.backgroundColor)}
                 />
                 <TouchableOpacity
                   style={[styles.color, grey]}
-                  onPress={() => this.setState({ color: grey.backgroundColor })}
+                  onPress={() => setColor(grey.backgroundColor)}
                 />
                 <TouchableOpacity
                   style={[styles.color, green]}
-                  onPress={() =>
-                    this.setState({ color: green.backgroundColor })
-                  }
+                  onPress={() => setColor(green.backgroundColor)}
                 />
               </View>
             </View>
             <TouchableOpacity
               style={[styles.nameBox, styles.chatBox]}
-              onPress={() =>
-                this.props.navigation.navigate("Chat", {
-                  name: this.state.name,
-                  color: this.state.color,
-                })
-              }
+              onPress={async () => {
+                const res = await signInAnonymously(auth);
+                navigation.navigate("Chat", {
+                  username: name,
+                  color,
+                  userId: res.user.uid,
+                });
+              }}
             >
               <Text style={[styles.colorText, styles.chatBoxText]}>
                 Start Chatting
@@ -78,10 +78,13 @@ export default class Start extends React.Component {
             </TouchableOpacity>
           </View>
         </ImageBackground>
-      </View>
-    );
-  }
-}
+      </TouchableWithoutFeedback>
+      {Platform.OS === "ios" ? (
+        <KeyboardAvoidingView behavior="padding" />
+      ) : null}
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -117,6 +120,7 @@ const styles = StyleSheet.create({
     fontWeight: "300",
     color: "#757083",
     opacity: 50,
+    paddingHorizontal: 10,
   },
   colorText: {
     textAlign: "center",
@@ -143,3 +147,5 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 });
+
+export default Start;
