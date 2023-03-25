@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import "react-native-gesture-handler";
 import { NavigationContainer } from "@react-navigation/native";
+import * as ImagePicker from "expo-image-picker";
 import Chat from "./components/Chat";
 import { createStackNavigator } from "@react-navigation/stack";
 import ShoppingList from "./components/ShoppingList";
