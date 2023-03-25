@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   addDoc,
   collection,
@@ -14,47 +15,74 @@ import {
   Text,
   View,
 } from "react-native";
-import { GiftedChat } from "react-native-gifted-chat";
+import { GiftedChat, InputToolbar } from "react-native-gifted-chat";
 
-const Chat = ({ db, route, navigation }) => {
+const Chat = ({ db, route, navigation, isConnected }) => {
   const { username, userId, color } = route.params;
   const [messages, setMessages] = useState([]);
+  // isConnected = false;
+  navigation.setOptions({
+    title: `${username} ${!isConnected ? "(offline)" : ""}`,
+  });
 
-  navigation.setOptions({ title: username });
+  const saveMessageLocally = async (localMessage) => {
+    const newMessage = localMessage.at(0);
+    const allMessages = [newMessage, ...messages];
+    await AsyncStorage.setItem("local_messages", JSON.stringify(allMessages));
+    setMessages(allMessages);
+  };
+
+  const copyMessageToLocalStorage = async (messages) => {
+    await AsyncStorage.setItem("local_messages", JSON.stringify(messages));
+  };
+
+  const loadCachedMessages = async () => {
+    const cachedMessages = await AsyncStorage.getItem("local_messages");
+    setMessages(JSON.parse(cachedMessages) || []);
+  };
 
   const onSend = useCallback(async (message = []) => {
-    console.log("message: ", message.at(0));
-    const newMessage = await addDoc(collection(db, "messages"), message.at(0));
-    console.log("new message");
-    if (newMessage.id) {
-      setMessages((previousMessages) =>
-        GiftedChat.append(previousMessages, newMessage)
+    if (isConnected) {
+      const newMessage = await addDoc(
+        collection(db, "messages"),
+        message.at(0)
       );
-    } else {
-      Alert.alert("Unable to add. Please try later");
-    }
+      if (newMessage.id) {
+        setMessages((previousMessages) =>
+          GiftedChat.append(previousMessages, newMessage)
+        );
+      } else {
+        Alert.alert("Unable to add. Please try later");
+      }
+    } else saveMessageLocally(message);
   }, []);
 
+  let unsubMessages;
   useEffect(() => {
-    const unsubMessages = onSnapshot(
-      query(collection(db, "messages"), orderBy("createdAt", "desc")),
-      (snapshot) => {
-        const dbMessages = [];
-        snapshot.forEach((doc) => {
-          dbMessages.push({
-            id: doc.id,
-            ...doc.data(),
-            createdAt: new Date(doc.data().createdAt.toMillis()),
-          });
-        });
-        setMessages(dbMessages);
-      }
-    );
+    if (isConnected === true) {
+      if (unsubMessages) unsubMessages();
+      unsubMessages = null;
 
+      unsubMessages = onSnapshot(
+        query(collection(db, "messages"), orderBy("createdAt", "desc")),
+        (snapshot) => {
+          const dbMessages = [];
+          snapshot.forEach((doc) => {
+            dbMessages.push({
+              id: doc.id,
+              ...doc.data(),
+              createdAt: new Date(doc.data().createdAt.toMillis()),
+            });
+          });
+          setMessages(dbMessages);
+          copyMessageToLocalStorage(dbMessages);
+        }
+      );
+    } else loadCachedMessages();
     return () => {
       if (unsubMessages) unsubMessages();
     };
-  }, []);
+  }, [isConnected]);
 
   return (
     <View
@@ -67,16 +95,18 @@ const Chat = ({ db, route, navigation }) => {
     >
       <GiftedChat
         messages={messages}
+        renderInputToolbar={(props) => <InputToolbar {...props} />}
         onSend={(messages) => onSend(messages)}
         renderUsername={(user) => <Text>{user.name}</Text>}
         alwaysShowSend
         minInputToolbarHeight={60}
-        renderLoading={() => <ActivityIndicator />}
+        renderLoading={() => <ActivityIndicator animating={true} />}
         user={{
           _id: userId,
           name: username,
         }}
       />
+
       {Platform.OS === "ios" ? (
         <KeyboardAvoidingView behavior="position" />
       ) : null}
