@@ -6,6 +6,7 @@ import { Button } from "react-native";
 import "react-native-gesture-handler";
 import { NavigationContainer } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
+import * as MediaLibrary from "expo-media-library";
 import Chat from "./components/Chat";
 import { createStackNavigator } from "@react-navigation/stack";
 import ShoppingList from "./components/ShoppingList";
@@ -35,6 +36,22 @@ const App = () => {
     }
   }, [connectionStatus.isConnected]);
 
+ const takePhoto = async () => {
+   let permissions = await ImagePicker.requestCameraPermissionsAsync();
+
+   if (permissions?.granted) {
+     let result = await ImagePicker.launchCameraAsync();
+
+     if (!result.canceled) {
+       let mediaLibraryPermissions = await MediaLibrary.requestPermissionsAsync();
+
+       if (mediaLibraryPermissions?.granted) await MediaLibrary.saveToLibraryAsync(result.assets[0].uri);
+
+       setImage(result.assets[0]);
+     }else setImage(null)
+   }
+ }
+
   const pickImage = async () => {
     let permissions = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
@@ -49,7 +66,14 @@ const App = () => {
   return (
     <View style={styles.container}>
       <Button title="Pick an image from the library" onPress={pickImage} />
-      <Button title="Take a photo" onPress={() => {}} />
+
+      <Button title="Take a photo" onPress={takePhoto} />
+      {image && (
+        <Image
+          source={{ uri: image.uri }}
+          style={{ width: 200, height: 200 }}
+        />
+      )}
     </View>
   );
 };
