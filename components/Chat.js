@@ -15,15 +15,34 @@ import {
   Text,
   View,
 } from "react-native";
-import { GiftedChat, InputToolbar } from "react-native-gifted-chat";
+import { Bubble, GiftedChat, InputToolbar } from "react-native-gifted-chat";
+import MapView from "react-native-maps";
+import CustomActions from "./CustomActions";
 
-const Chat = ({ db, route, navigation, isConnected }) => {
+const Chat = ({ storage, db, route, navigation, isConnected }) => {
   const { username, userId, color } = route.params;
   const [messages, setMessages] = useState([]);
-  // isConnected = false;
   navigation.setOptions({
     title: `${username} ${!isConnected ? "(offline)" : ""}`,
   });
+
+  const renderCustomView = (props) => {
+    const { currentMessage } = props;
+    if (currentMessage.location) {
+      return (
+        <MapView
+          style={{ width: 150, height: 100, borderRadius: 13, margin: 3 }}
+          region={{
+            latitude: currentMessage.location.latitude,
+            longitude: currentMessage.location.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          }}
+        />
+      );
+    }
+    return <Bubble {...props} />;
+  };
 
   const saveMessageLocally = async (localMessage) => {
     const newMessage = localMessage.at(0);
@@ -56,6 +75,11 @@ const Chat = ({ db, route, navigation, isConnected }) => {
       }
     } else saveMessageLocally(message);
   }, []);
+
+  /* custom actions */
+  const renderCustomActions = (props) => {
+    return <CustomActions storage={storage} {...props} />;
+  };
 
   let unsubMessages;
   useEffect(() => {
@@ -98,6 +122,8 @@ const Chat = ({ db, route, navigation, isConnected }) => {
         renderInputToolbar={(props) => <InputToolbar {...props} />}
         onSend={(messages) => onSend(messages)}
         renderUsername={(user) => <Text>{user.name}</Text>}
+        renderActions={renderCustomActions}
+        renderBubble={renderCustomView}
         alwaysShowSend
         minInputToolbarHeight={60}
         renderLoading={() => <ActivityIndicator animating={true} />}
